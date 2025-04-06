@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location-Based Attendance</title>
+</head>
+<body>
+    <h2>Attendance System</h2>
+    <button onclick="markAttendance()">Mark Attendance</button>
+    <p id="status"></p>
+
+    <script>
+        function markAttendance() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const { latitude, longitude } = position.coords;
+                        fetch("http://localhost:5000/user/submit-location", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ 
+                                userId: "user123",  // Replace with actual user ID
+                                latitude,
+                                longitude
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            document.getElementById("status").innerText = data.message;
+                        })
+                        .catch(error => console.error("Error:", error));
+                    },
+                    (error) => {
+                        document.getElementById("status").innerText = "Error getting location!";
+                        console.error("Geolocation error:", error);
+                    }
+                );
+            } else {
+                document.getElementById("status").innerText = "Geolocation is not supported by this browser.";
+            }
+        }
+    </script>
+</body>
+</html>
